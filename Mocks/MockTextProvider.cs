@@ -10,6 +10,7 @@ namespace CrossInform.FrequencyTextAnalyzer
     public class MockTextProvider : ITextProvider
     {
         private string text = "Test text, lalalalalalalla";
+
         public void SetText(string text)
         {
             this.text = text;
