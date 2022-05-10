@@ -40,7 +40,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             // 3) Запустить N-потоков которые будут анализировать свои сегменты и сохранять результаты в свои бакеты
             // 4) Подождать пока все потоки завершатся после чего соеденить результаты
             // 5) Вывести статистику по результатам
-            
+
             string text = textProvider.GetText();
             if (String.IsNullOrEmpty(text))
             {
@@ -51,7 +51,8 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             //int currentThreadsCount = threadsCount;
             // HACK: Хардкод
-            int currentThreadsCount = 1;
+            threadsCount = 1;
+            int currentThreadsCount = threadsCount;
 
             isAnalysing = true;
             Stopwatch sw = new Stopwatch();
@@ -66,9 +67,11 @@ namespace CrossInform.FrequencyTextAnalyzer
             Task<Dictionary<char[], int>>[] tasks = new Task<Dictionary<char[], int>>[segmentsCount];
             for (int i = 0; i < segmentsCount; i++)
             {
-                tasks[i] = Task<Dictionary<char[], int>>.Factory.StartNew(() => { return TextUtils.FindCharSequenceInText(textSegments[i], charsCountToSearch); });
+                // Создал локальную переменную t т.к. textSegments выходит за границы контекста асинхронной задачи и ложит программу.
+                string t = textSegments[i];
+                tasks[i] = Task<Dictionary<char[], int>>.Factory.StartNew(() => { return TextUtils.FindCharSequenceInText(t, charsCountToSearch); });
             }
-            
+
             Dictionary<char[], int>[] taskResults = new Dictionary<char[], int>[segmentsCount];
 
             // Попытка считать результаты выполнения тасков. Если результат не готов - поток блокируется до его получения
@@ -77,7 +80,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             {
                 taskResults[i] = tasks[i].Result;
             }
-            
+
             AnalyseResultState resultState = AnalyseResultState.Complete;
             Dictionary<char[], int> resultDictionary = new Dictionary<char[], int>();
 
@@ -130,7 +133,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             // HACK: хардкод
             else throw new NotImplementedException();
         }
-        
+
 
         public bool IsAnalysing
         {
@@ -161,5 +164,5 @@ namespace CrossInform.FrequencyTextAnalyzer
             isAbortRequested = true;
         }
     }
-    
+
 }
