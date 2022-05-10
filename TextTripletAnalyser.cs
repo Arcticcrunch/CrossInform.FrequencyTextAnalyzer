@@ -66,7 +66,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             Task<Dictionary<char[], int>>[] tasks = new Task<Dictionary<char[], int>>[segmentsCount];
             for (int i = 0; i < segmentsCount; i++)
             {
-                tasks[i] = Task<Dictionary<char[], int>>.Factory.StartNew(() => { return FindCharSequenceInText(textSegments[i], charsCountToSearch); });
+                tasks[i] = Task<Dictionary<char[], int>>.Factory.StartNew(() => { return TextUtils.FindCharSequenceInText(textSegments[i], charsCountToSearch); });
             }
             
             Dictionary<char[], int>[] taskResults = new Dictionary<char[], int>[segmentsCount];
@@ -109,6 +109,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             TextAnalyseResult result = new TextAnalyseResult(resultState, sw.ElapsedMilliseconds, resultDictionary, textProvider);
             sw.Stop();
             isAnalysing = false;
+            isAbortRequested = false;
             return result;
         }
 
