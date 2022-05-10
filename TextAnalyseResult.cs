@@ -10,14 +10,24 @@ namespace CrossInform.FrequencyTextAnalyzer
     public class TextAnalyseResult : ITextAnalyseResult
     {
         private double executionDuration = 0;
+        private AnalyseResultState resultState = AnalyseResultState.ReadyToStart;
         private string result;
         private ITextProvider textProvider;
 
-        public TextAnalyseResult(double executionDuration, string result, ITextProvider textProvider)
+        public TextAnalyseResult(AnalyseResultState resultState, double executionDuration, string result, ITextProvider textProvider)
         {
             this.executionDuration = executionDuration;
+            this.resultState = resultState;
             this.result = result;
             this.textProvider = textProvider;
+        }
+
+        public AnalyseResultState ResultState
+        {
+            get
+            {
+                return resultState;
+            }
         }
 
         public double GetExecutionDuration()
