@@ -129,45 +129,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             // HACK: хардкод
             else throw new NotImplementedException();
         }
-
-        // TODO: Вынести этот метод в отдельный класс т.к. он с данным класом никак не связан
-        // кроме как полем isAbortRequested, а в других реализациях ITextAnalyser может понадобиться
-
-        /// <summary>
-        /// Синхронный однопоточный метод поиска n-последовательности символов в тексте
-        /// </summary>
-        /// <param name="text">Входной текст</param>
-        /// <param name="charCount">Кол-во символов для поиска</param>
-        /// <returns></returns>
-        private Dictionary<char[], int> FindCharSequenceInText(string text, int charCount)
-        {
-            Dictionary<char[], int> result = new Dictionary<char[], int>();
-
-            char[] buffer = new char[charCount];
-            int curentCharsCount = 0;
-            int index = 0;
-
-            //while (isAbortRequested == false && index < text.Length)
-            //{
-            //    char ch = text[index];
-            //    if (char.IsLetter(ch))
-            //    {
-            //        buffer[curentCharsCount] = ch;
-            //        curentCharsCount++;
-            //    }
-            //    else curentCharsCount = 0;
-            //
-            //    // Набралось нужное кол-во символов. Можно добавить его в словарь.
-            //    //if (curentCharsCount == charCount)
-            //    //{
-            //    //    if (result.ContainsKey(buffer))
-            //    //}
-            //
-            //    index++;
-            //}
-
-            return result;
-        }
+        
 
         public bool IsAnalysing
         {
