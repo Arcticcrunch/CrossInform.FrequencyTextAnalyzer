@@ -8,8 +8,8 @@ namespace CrossInform.FrequencyTextAnalyzer.Interfaces
 {
     public interface ITextAnalyser
     {
-        ITextAnalyseResult SyncAnalyseText(ITextProvider textProvider);
-        int MinThreadsCount { get; set; }
+        ITextStatisticsAnalyseResult SyncAnalyseText(ITextProvider textProvider);
+        int ThreadsCount { get; set; }
         bool IsAnalysing { get; }
         void RequestAbort();
     }

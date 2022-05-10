@@ -33,7 +33,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             Thread th = new Thread(TextInConsoleAnalyseLoop);
             th.Start();
 
-            ITextAnalyseResult result = textAnalyser.SyncAnalyseText(textProvider);
+            ITextStatisticsAnalyseResult result = textAnalyser.SyncAnalyseText(textProvider);
 
             while(isAnalysing)
             {

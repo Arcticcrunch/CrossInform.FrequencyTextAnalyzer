@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace CrossInform.FrequencyTextAnalyzer.Interfaces
 {
-    public interface ITextAnalyseResult
+    /// <summary>
+    /// Интерфейс для реализации хранения статистического анализа текста (какие были последовательности символы и их кол-во)
+    /// </summary>
+    public interface ITextStatisticsAnalyseResult
     {
-        string GetResult();
+        Dictionary<char[], int> StatisticsResult { get; }
         AnalyseResultState ResultState { get; }
         double GetExecutionDuration();
         ITextProvider GetOriginText();

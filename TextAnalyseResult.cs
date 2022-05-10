@@ -7,18 +7,18 @@ using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
 namespace CrossInform.FrequencyTextAnalyzer
 {
-    public class TextAnalyseResult : ITextAnalyseResult
+    public class TextAnalyseResult : ITextStatisticsAnalyseResult
     {
         private double executionDuration = 0;
-        private AnalyseResultState resultState = AnalyseResultState.ReadyToStart;
-        private string result;
+        private AnalyseResultState resultState;
+        private Dictionary<char[], int> statisticsResult = new Dictionary<char[], int>();
         private ITextProvider textProvider;
 
-        public TextAnalyseResult(AnalyseResultState resultState, double executionDuration, string result, ITextProvider textProvider)
+        public TextAnalyseResult(AnalyseResultState resultState, double executionDuration, Dictionary<char[], int> result, ITextProvider textProvider)
         {
             this.executionDuration = executionDuration;
             this.resultState = resultState;
-            this.result = result;
+            this.statisticsResult = result;
             this.textProvider = textProvider;
         }
 
@@ -30,6 +30,14 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
         }
 
+        public Dictionary<char[], int> StatisticsResult
+        {
+            get
+            {
+                return statisticsResult;
+            }
+        }
+
         public double GetExecutionDuration()
         {
             return executionDuration;
@@ -38,11 +46,6 @@ namespace CrossInform.FrequencyTextAnalyzer
         public ITextProvider GetOriginText()
         {
             return this.textProvider;
-        }
-
-        public string GetResult()
-        {
-            return result;
         }
     }
 }

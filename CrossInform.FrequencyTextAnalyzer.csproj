@@ -65,11 +65,12 @@
     <Compile Include="Interfaces\ITextAnalyser.cs" />
     <Compile Include="Interfaces\ITextAnalyseResult.cs" />
     <Compile Include="Interfaces\ITextProvider.cs" />
-    <Compile Include="MockTextProvider.cs" />
+    <Compile Include="Mocks\MockTextProvider.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextAnalyseResult.cs" />
     <Compile Include="TextTripletAnalyser.cs" />
+    <Compile Include="TextUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
