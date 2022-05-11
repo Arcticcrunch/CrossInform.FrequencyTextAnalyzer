@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading;
 using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
@@ -43,15 +42,15 @@ namespace CrossInform.FrequencyTextAnalyzer
             {
                 string path;
                 Console.Clear();
-                Console.WriteLine("Введите относительный путь к текстовому файлу для анализа или ESC для выхода:");
+                Console.WriteLine("Введите путь к текстовому файлу для анализа или пустую строку для выхода:");
 
                 bool isPathInputCanceled = false;
                 while (true)
                 {
                     try
                     {
-                        path = CustomReadline();
-                        if (path == null)
+                        path = Console.ReadLine();
+                        if (path == "")
                         {
                             isPathInputCanceled = true;
                             break;
@@ -63,13 +62,13 @@ namespace CrossInform.FrequencyTextAnalyzer
                         else
                         {
                             Console.Clear();
-                            Console.WriteLine("Данный файл не существует. Повторно введите путь к файлу или ESC для выхода:");
+                            Console.WriteLine("Данный файл не существует. Повторно введите путь к файлу или пустую строку для выхода:");
                         }
                     }
                     catch (Exception e)
                     {
                         Console.Clear();
-                        Console.WriteLine("При открытии файла возникла ошибка: " + e.Message + ". Повторно введите путь к файлу или ESC для выхода:");
+                        Console.WriteLine("При открытии файла возникла ошибка: " + e.Message + ". Повторно введите путь к файлу или пустую строку для выхода:");
                     }
                 }
                 if (isPathInputCanceled)
@@ -162,30 +161,5 @@ namespace CrossInform.FrequencyTextAnalyzer
             isAnalysing = false;
         }
 
-        /// <summary>
-        /// Кастомный метод ввода. В случае нажатия клавиши ESС вернёт null
-        /// </summary>
-        /// <returns></returns>
-        static private string CustomReadline()
-        {
-            StringBuilder buffer = new StringBuilder();
-            ConsoleKeyInfo info = Console.ReadKey(true);
-
-            while (info.Key != ConsoleKey.Enter && info.Key != ConsoleKey.Escape)
-            {
-                Console.Write(info.KeyChar);
-                buffer.Append(info.KeyChar);
-                info = Console.ReadKey(true);
-            }
-
-            if (info.Key == ConsoleKey.Enter)
-            {
-                return buffer.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 }
