@@ -72,6 +72,7 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
         [DataRow("Text Lorem ipsum.txt", 10)]
         [DataRow("Text Lorem ipsum.txt", 24)]
         [DataRow("Text Lorem ipsum.txt", 50)]
+        
         public void AnalyseFromFileCheckMultithreaded_AnalyseText_Test(string value, int value2)
         {
             // arrange
@@ -91,5 +92,73 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
             Assert.AreEqual(456, result.StatisticsResult.Count);
         }
 
+        [DataRow("Text Wiki.txt", 1)]
+        [DataRow("Text Wiki.txt", 10)]
+        [DataRow("Text Wiki.txt", 24)]
+        [DataRow("Text Wiki.txt", 50)]
+        public void AnalyseFromFileCheckMultithreadedRussianText_AnalyseText_Test(string value, int value2)
+        {
+            // arrange
+
+            FileTextReader fileContent = new FileTextReader();
+            fileContent.OpenFile(value);
+
+            TextTripletAnalyser analyser = new TextTripletAnalyser();
+            TextAnalyseParams parameters = new TextAnalyseParams(value2);
+
+            // act
+
+            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent, parameters);
+
+            // assert
+
+            Assert.AreEqual(468, result.StatisticsResult.Count);
+        }
+
+        [DataRow("Text Empty.txt", 1)]
+        [DataRow("Text Empty.txt", 10)]
+        [DataRow("Text Empty.txt", 24)]
+        [DataRow("Text Empty.txt", 50)]
+        public void AnalyseFromEmptyFileCheck_AnalyseText_Test(string value, int value2)
+        {
+            // arrange
+
+            FileTextReader fileContent = new FileTextReader();
+            fileContent.OpenFile(value);
+
+            TextTripletAnalyser analyser = new TextTripletAnalyser();
+            TextAnalyseParams parameters = new TextAnalyseParams(value2);
+
+            // act
+
+            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent, parameters);
+
+            // assert
+
+            //Assert.AreEqual(468, result.StatisticsResult.Count);
+        }
+
+        [DataRow("Text without letters.txt", 1)]
+        [DataRow("Text without letters.txt", 10)]
+        [DataRow("Text without letters.txt", 24)]
+        [DataRow("Text without letters.txt", 50)]
+        public void AnalyseFromFileWithourLettersCheck_AnalyseText_Test(string value, int value2)
+        {
+            // arrange
+
+            FileTextReader fileContent = new FileTextReader();
+            fileContent.OpenFile(value);
+
+            TextTripletAnalyser analyser = new TextTripletAnalyser();
+            TextAnalyseParams parameters = new TextAnalyseParams(value2);
+
+            // act
+
+            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent, parameters);
+
+            // assert
+
+            //Assert.AreEqual(468, result.StatisticsResult.Count);
+        }
     }
 }

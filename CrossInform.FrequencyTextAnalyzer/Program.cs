@@ -63,7 +63,14 @@ namespace CrossInform.FrequencyTextAnalyzer
                         }
                         if (File.Exists(path))
                         {
-                            break;
+                            textProvider.OpenFile(path);
+                            if (textProvider.GetText() == "")
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Данный файл пуст. Повторно введите путь к файлу или пустую строку для выхода:");
+                            }
+                            else
+                                break;
                         }
                         else
                         {
