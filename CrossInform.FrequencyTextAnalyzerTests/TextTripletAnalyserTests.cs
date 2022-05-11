@@ -58,9 +58,15 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
             TextTripletAnalyser analyser = new TextTripletAnalyser();
 
             // act
+
             TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent);
+
             // assert
+
+            Assert.AreEqual(456, result.StatisticsResult.Count);
+            //Assert.AreEqual(3, result.StatisticsResult["lor"]);
             //result.StatisticsResult()
+            //456
             //Assert.ThrowsException<Exception>(() => analyser.SyncAnalyseText(fileContent));
         }
 

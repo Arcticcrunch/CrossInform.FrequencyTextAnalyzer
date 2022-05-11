@@ -10,6 +10,8 @@ namespace CrossInform.FrequencyTextAnalyzer
 {
     public static class TextUtils
     {
+        public const int PROGRESS_BAR_CHARS_COUNT = 30;
+
         /// <summary>
         /// Синхронный однопоточный метод поиска n-последовательности символов в тексте
         /// </summary>
@@ -74,6 +76,46 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
 
             return result;
+        }
+
+        public static string FormatTextAnalyseResult(ITextStatisticsAnalyseResult result, int samplesCount = 10)
+        {
+            // Убеждаюсь что кол-во результатов выборки не превышает общее кол-во результатов
+            samplesCount = result.StatisticsResult.Count < samplesCount ? result.StatisticsResult.Count : samplesCount;
+
+            // Использую StringBuilder т.к. предпологается частая модификация стринга (особенно при большом выборке). Каждое изменение
+            // стринга вызывает создание нового экземпляра и аллокацию памяти под него
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("Общее кол-во символов: ");
+            sb.Append(result.GetOriginText().GetText().Length);
+            sb.Append("\n");
+            sb.Append("Кол-во уникальных последовательностей символов: ");
+            sb.Append(result.StatisticsResult.Count);
+            sb.Append("\n");
+            sb.Append("Самые часто встречаемые последовательности символов:\n\n");
+            
+            // Сортировка коллекции по убыванию и выборка первых n элементов для вывода
+            // Использование LINQа самое простое решение... но не самое быстрое...
+            var resultCollection = (from i in result.StatisticsResult orderby i.Value descending select i).Take(samplesCount);
+
+            int index = 1;
+            foreach (var item in resultCollection)
+            {
+                sb.Append(index);
+                sb.Append(" - '");
+                sb.Append(item.Key);
+                sb.Append("': ");
+                sb.Append(item.Value);
+                sb.Append("\n");
+                index++;
+            }
+            
+            sb.Append("\n");
+            sb.Append("Затраченное время: ");
+            sb.Append(result.GetExecutionDuration());
+            sb.Append(" мс\n");
+            return sb.ToString();
         }
     }
 }

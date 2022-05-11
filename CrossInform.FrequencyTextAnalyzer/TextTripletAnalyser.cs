@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
@@ -123,7 +120,20 @@ namespace CrossInform.FrequencyTextAnalyzer
             if (segmentsCount == 1)
                 return new string[] { text };
             // HACK: хардкод
-            else throw new NotImplementedException();
+            //else throw new NotImplementedException();
+
+            else
+            {
+                // HACK: не учитывается то что слово может разделится в разные сегменты. доделать этот метод!
+                string[] resultArr = new string[segmentsCount];
+                int segmentLength = text.Length / segmentsCount;
+                for (int i = 0; i < segmentsCount; i++)
+                {
+                    resultArr[i] = text.Substring(segmentLength * i, segmentLength);
+                }
+                return resultArr;
+                //return new string[] { text.Substring(0, text.Length / 2), text.Substring(text.Length / 2, (text.Length / 2)) };
+            }
         }
 
 
@@ -158,7 +168,6 @@ namespace CrossInform.FrequencyTextAnalyzer
                 return isAbortRequested;
             }
         }
-        
 
         public void RequestAbort()
         {

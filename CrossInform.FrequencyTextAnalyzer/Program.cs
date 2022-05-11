@@ -126,7 +126,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             else
             {
                 Console.WriteLine("Анализ завершен.");
-                Console.WriteLine("Кол-во уникальных ключей: " + result.StatisticsResult.Count);
+                Console.WriteLine(TextUtils.FormatTextAnalyseResult(result));
             }
 
         }
