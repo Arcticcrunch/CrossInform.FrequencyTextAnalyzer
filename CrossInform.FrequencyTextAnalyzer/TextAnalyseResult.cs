@@ -71,6 +71,9 @@ namespace CrossInform.FrequencyTextAnalyzer
         /// <param name="secondResult">Вторая последовательность (её элементы будут добавлен к первой)</param>
         public static void MergeResults(Dictionary<char[], int> firstResult, Dictionary<char[], int> secondResult)
         {
+            if (firstResult == null || secondResult == null)
+                throw new NullReferenceException();
+
             var keys = secondResult.Keys;
             foreach (var key in keys)
             {
