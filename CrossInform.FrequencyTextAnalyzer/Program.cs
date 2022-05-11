@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
 namespace CrossInform.FrequencyTextAnalyzer
@@ -19,6 +17,7 @@ namespace CrossInform.FrequencyTextAnalyzer
         private static int maxDots = 3;
         #endregion
 
+        private static bool isExitRequested = false;
         private static bool isAnalysing = true;
         private static ITextAnalyser textAnalyser;
         private static FileTextReader textProvider;
@@ -36,47 +35,73 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             //MockTextProvider textProvider = new MockTextProvider();
             //textProvider.SetText("asdf  ffd asdf asdq");
-
+            
             textProvider = new FileTextReader();
             textProvider.OpenFile("Text Lorem ipsum.txt");
 
-
-            consoleOutputLoopThread = new Thread(TextInConsoleAnalyseLoop);
-            consoleOutputLoopThread.Start();
-
-            analyseThread = new Thread(AnalyseTextLoop);
-            analyseThread.Start();
-
-            //analyseTask = new Task<ITextStatisticsAnalyseResult>(() => 
-            //{
-            //    isAnalysing = true;
-            //    ITextStatisticsAnalyseResult r = textAnalyser.SyncAnalyseText(textProvider);
-            //    isAnalysing = false;
-            //    return r;
-            //});
-            //analyseTask.Start();
-            
-
-
-            while(isAnalysing)
+            while (isExitRequested == false)
             {
-                var s = Console.ReadKey();
-                if(s.Key == ConsoleKey.Escape)
+                string path;
+                Console.Clear();
+                Console.WriteLine("Введите относительный путь к текстовому файлу для анализа или ESC для выхода:");
+
+                bool isPathInputCanceled = false;
+                while (true)
                 {
-                    textAnalyser.RequestAbort();
+                    try
+                    {
+                        path = CustomReadline();
+                        if (path == null)
+                        {
+                            isPathInputCanceled = true;
+                            break;
+                        }
+                        if (File.Exists(path))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Данный файл не существует. Повторно введите путь к файлу или ESC для выхода:");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("При открытии файла возникла ошибка: " + e.Message + ". Повторно введите путь к файлу или ESC для выхода:");
+                    }
                 }
+                if (isPathInputCanceled)
+                    break;
+
+                consoleOutputLoopThread = new Thread(TextInConsoleAnalyseLoop);
+                consoleOutputLoopThread.Start();
+
+                analyseThread = new Thread(AnalyseTextLoop);
+                analyseThread.Start();
+                
+
+
+
+                while (isAnalysing)
+                {
+                    var s = Console.ReadKey();
+                    if (s.Key == ConsoleKey.Escape)
+                    {
+                        textAnalyser.RequestAbort();
+                    }
+                }
+
+                Console.ReadKey();
             }
-
-
-
-            
-            //Console.WriteLine("{0}Частотный анализ завершен.{0}{1}{0}{0}Время выполнения: {2} мс",
-            //    Environment.NewLine, result.GetResult(), result.GetExecutionDuration());
-
-            Console.ReadKey();
         }
 
-        static private void TextInConsoleAnalyseLoop()
+
+        /// <summary>
+        /// Данный метод должен вызываться в собственном потоке. Отвечает за вывод текста в консоль пока выполняется анализ.
+        /// </summary>
+        private static void TextInConsoleAnalyseLoop()
         {
             Console.Clear();
             string text = "Анализ текста";
@@ -86,12 +111,6 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             while (isAnalysing)
             {
-                //if (textAnalyser.IsAnalysing == false)
-                //{
-                //    isAnalysing = false;
-                //    break;
-                //}
-
                 timePassed = timePassed.Add(DateTime.Now - lastUpdateTime);
                 dotsCount++;
                 if (dotsCount > maxDots)
@@ -111,6 +130,7 @@ namespace CrossInform.FrequencyTextAnalyzer
                 Console.WriteLine("ESC - для отмены");
 
                 lastUpdateTime = DateTime.Now;
+                // Задержка потока обновления текста в консоли (нужно для анимации)
                 Thread.Sleep(CONSOLE_UPDATE_INTERVAL_MILLIS);
             }
 
@@ -122,20 +142,50 @@ namespace CrossInform.FrequencyTextAnalyzer
             if (textAnalyser.IsAbortRequested)
             {
                 Console.WriteLine("Анализ прерван. Прошло времени: " + timePassed.ToString(@"hh\:mm\:ss"));
+                Console.WriteLine("\nНажмите любую кнопку для продолжения...");
             }
             else
             {
-                Console.WriteLine("Анализ завершен.");
+                Console.WriteLine("Анализ текста на наличие триплетов (3 идущих подряд буквы слова) завершен.");
                 Console.WriteLine(TextUtils.FormatTextAnalyseResult(result));
             }
 
         }
 
-        static private void AnalyseTextLoop()
+        /// <summary>
+        /// Данный метод должен вызываться в собственном потоке. Начинает непосредственный анализ текста
+        /// </summary>
+        private static void AnalyseTextLoop()
         {
             isAnalysing = true;
             result = (TextAnalyseResult)textAnalyser.SyncAnalyseText(textProvider);
             isAnalysing = false;
+        }
+
+        /// <summary>
+        /// Кастомный метод ввода. В случае нажатия клавиши ESС вернёт null
+        /// </summary>
+        /// <returns></returns>
+        static private string CustomReadline()
+        {
+            StringBuilder buffer = new StringBuilder();
+            ConsoleKeyInfo info = Console.ReadKey(true);
+
+            while (info.Key != ConsoleKey.Enter && info.Key != ConsoleKey.Escape)
+            {
+                Console.Write(info.KeyChar);
+                buffer.Append(info.KeyChar);
+                info = Console.ReadKey(true);
+            }
+
+            if (info.Key == ConsoleKey.Enter)
+            {
+                return buffer.ToString();
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
