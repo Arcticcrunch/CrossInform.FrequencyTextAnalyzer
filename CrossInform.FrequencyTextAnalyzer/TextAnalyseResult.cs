@@ -11,10 +11,10 @@ namespace CrossInform.FrequencyTextAnalyzer
     {
         private long executionDuration = 0;
         private AnalyseResultState resultState;
-        private Dictionary<char[], int> statisticsResult = new Dictionary<char[], int>();
+        private Dictionary<string, int> statisticsResult = new Dictionary<string, int>();
         private ITextProvider textProvider;
 
-        public TextAnalyseResult(AnalyseResultState resultState, long executionDuration, Dictionary<char[], int> result, ITextProvider textProvider)
+        public TextAnalyseResult(AnalyseResultState resultState, long executionDuration, Dictionary<string, int> result, ITextProvider textProvider)
         {
             this.executionDuration = executionDuration;
             this.resultState = resultState;
@@ -30,7 +30,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
         }
 
-        public Dictionary<char[], int> StatisticsResult
+        public Dictionary<string, int> StatisticsResult
         {
             get
             {
@@ -56,7 +56,7 @@ namespace CrossInform.FrequencyTextAnalyzer
         /// </summary>
         /// <param name="secondResult">Вторая последовательность (её элементы будут добавлен к первой)</param>
         /// <returns></returns>
-        public void MergeResults( Dictionary<char[], int> secondResult)
+        public void MergeResults( Dictionary<string, int> secondResult)
         {
             // Использование статического варианта
             MergeResults(statisticsResult, secondResult);
@@ -69,7 +69,7 @@ namespace CrossInform.FrequencyTextAnalyzer
         /// </summary>
         /// <param name="firstResult">Первая последовательность (к ней будут добавлены элементы второй)</param>
         /// <param name="secondResult">Вторая последовательность (её элементы будут добавлен к первой)</param>
-        public static void MergeResults(Dictionary<char[], int> firstResult, Dictionary<char[], int> secondResult)
+        public static void MergeResults(Dictionary<string, int> firstResult, Dictionary<string, int> secondResult)
         {
             if (firstResult == null || secondResult == null)
                 throw new NullReferenceException();

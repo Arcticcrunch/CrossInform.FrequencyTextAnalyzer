@@ -63,15 +63,15 @@ namespace CrossInform.FrequencyTextAnalyzer
             int segmentsCount = textSegments.Length;
 
             // Создание массива тасков в количестве равном полученному кол-ву сегментов
-            Task<Dictionary<char[], int>>[] tasks = new Task<Dictionary<char[], int>>[segmentsCount];
+            Task<Dictionary<string, int>>[] tasks = new Task<Dictionary<string, int>>[segmentsCount];
             for (int i = 0; i < segmentsCount; i++)
             {
                 // Создал локальную переменную t т.к. textSegments выходит за границы контекста асинхронной задачи и ложит программу.
                 string t = textSegments[i];
-                tasks[i] = Task<Dictionary<char[], int>>.Factory.StartNew(() => { return TextUtils.FindCharSequenceInText(t, charsCountToSearch); });
+                tasks[i] = Task<Dictionary<string, int>>.Factory.StartNew(() => { return TextUtils.FindCharSequenceInText(t, charsCountToSearch, this); });
             }
 
-            Dictionary<char[], int>[] taskResults = new Dictionary<char[], int>[segmentsCount];
+            Dictionary<string, int>[] taskResults = new Dictionary<string, int>[segmentsCount];
 
             // Попытка считать результаты выполнения тасков. Если результат не готов - поток блокируется до его получения
             // Таким образом собираются результаты всех тасков (вместо использования .Join)
@@ -81,7 +81,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
 
             AnalyseResultState resultState = AnalyseResultState.Complete;
-            Dictionary<char[], int> resultDictionary = new Dictionary<char[], int>();
+            Dictionary<string, int> resultDictionary = new Dictionary<string, int>();
             
 
             // Проверка был ли вызван аборт
@@ -147,6 +147,14 @@ namespace CrossInform.FrequencyTextAnalyzer
                 if (value < MIN_THREADS_COUNT || value > MAX_THREADS_COUNT)
                     throw new Exception("Заданное число поток вне допустимых границ: " + MAX_THREADS_COUNT + "-" + MAX_THREADS_COUNT + "! Получено значение: " + value);
                 this.threadsCount = value;
+            }
+        }
+
+        public bool IsAbortRequested
+        {
+            get
+            {
+                return isAbortRequested;
             }
         }
 

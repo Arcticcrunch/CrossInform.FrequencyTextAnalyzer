@@ -11,6 +11,7 @@ namespace CrossInform.FrequencyTextAnalyzer.Interfaces
         ITextStatisticsAnalyseResult SyncAnalyseText(ITextProvider textProvider);
         int ThreadsCount { get; set; }
         bool IsAnalysing { get; }
+        bool IsAbortRequested { get; }
         void RequestAbort();
     }
 }

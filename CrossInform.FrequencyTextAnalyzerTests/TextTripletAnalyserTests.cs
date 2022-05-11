@@ -45,5 +45,25 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
             // assert
             Assert.ThrowsException<Exception>(() => analyser.SyncAnalyseText(textProvider));
         }
+
+        [TestMethod()]
+        [DataRow("Text Lorem ipsum.txt")]
+        public void AnalyseFromFileCheck_AnalyseText_Test(string value)
+        {
+            // arrange
+
+            FileTextReader fileContent = new FileTextReader();
+            fileContent.OpenFile(value);
+
+            TextTripletAnalyser analyser = new TextTripletAnalyser();
+
+            // act
+            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent);
+            // assert
+            //result.StatisticsResult()
+            //Assert.ThrowsException<Exception>(() => analyser.SyncAnalyseText(fileContent));
+        }
+
+        
     }
 }

@@ -27,8 +27,8 @@ namespace CrossInform.FrequencyTextAnalyzer
         static void Main(string[] args)
         {
             textAnalyser = new TextTripletAnalyser();
-            ITextProvider textProvider = new MockTextProvider();
-            
+            MockTextProvider textProvider = new MockTextProvider();
+            textProvider.SetText("asdf  ffd asdf asdq");
 
             Thread th = new Thread(TextInConsoleAnalyseLoop);
             th.Start();
