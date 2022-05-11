@@ -24,7 +24,7 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
             textProvider.SetText(value);
 
             // act
-            analyser.SyncAnalyseText(textProvider);
+            analyser.SyncAnalyseText(textProvider, null);
 
             // assert
         }
@@ -43,7 +43,7 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
             // act
 
             // assert
-            Assert.ThrowsException<Exception>(() => analyser.SyncAnalyseText(textProvider));
+            Assert.ThrowsException<Exception>(() => analyser.SyncAnalyseText(textProvider, null));
         }
 
         [TestMethod()]
@@ -59,13 +59,37 @@ namespace CrossInform.FrequencyTextAnalyzer.Tests
 
             // act
 
-            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent);
+            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent, null);
+
+            // assert
+
+            Assert.AreEqual(456, result.StatisticsResult.Count);
+        }
+        
+
+        [TestMethod()]
+        [DataRow("Text Lorem ipsum.txt", 1)]
+        [DataRow("Text Lorem ipsum.txt", 10)]
+        [DataRow("Text Lorem ipsum.txt", 24)]
+        [DataRow("Text Lorem ipsum.txt", 50)]
+        public void AnalyseFromFileCheckMultithreaded_AnalyseText_Test(string value, int value2)
+        {
+            // arrange
+
+            FileTextReader fileContent = new FileTextReader();
+            fileContent.OpenFile(value);
+
+            TextTripletAnalyser analyser = new TextTripletAnalyser();
+            TextAnalyseParams parameters = new TextAnalyseParams(value2);
+
+            // act
+
+            TextAnalyseResult result = (TextAnalyseResult)analyser.SyncAnalyseText(fileContent, parameters);
 
             // assert
 
             Assert.AreEqual(456, result.StatisticsResult.Count);
         }
 
-        
     }
 }

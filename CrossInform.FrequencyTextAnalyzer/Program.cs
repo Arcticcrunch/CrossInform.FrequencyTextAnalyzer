@@ -21,6 +21,7 @@ namespace CrossInform.FrequencyTextAnalyzer
         private static ITextAnalyser textAnalyser;
         private static FileTextReader textProvider;
         private static TextAnalyseResult result;
+        private static int selectedProcessorsCount = TextAnalyseParams.MIN_THREADS_COUNT;
 
         private static Thread consoleOutputLoopThread;
         private static Thread analyseThread;
@@ -32,19 +33,24 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             textAnalyser = new TextTripletAnalyser();
 
-            //MockTextProvider textProvider = new MockTextProvider();
-            //textProvider.SetText("asdf  ffd asdf asdq");
-            
             textProvider = new FileTextReader();
             textProvider.OpenFile("Text Lorem ipsum.txt");
 
+            // Получить кол-во логических процессоров. Тесты показывают что использовани в 2 раза большего кол-ва
+            // потоков чем кол-во логических (не физических) ядер быстрее. Возможно связанно с уровнем приоритета потоков...
+            int defaultProcessorsCount = Environment.ProcessorCount * 2;
+
             while (isExitRequested == false)
             {
+
                 string path;
                 Console.Clear();
                 Console.WriteLine("Введите путь к текстовому файлу для анализа или пустую строку для выхода:");
 
                 bool isPathInputCanceled = false;
+                selectedProcessorsCount = defaultProcessorsCount;
+
+                #region Логика ввода
                 while (true)
                 {
                     try
@@ -74,12 +80,53 @@ namespace CrossInform.FrequencyTextAnalyzer
                 if (isPathInputCanceled)
                     break;
 
+                Console.Clear();
+                Console.WriteLine("Введите количество потоков " + TextAnalyseParams.MIN_THREADS_COUNT + "-" + TextAnalyseParams.MAX_THREADS_COUNT
+                    + " (по умолчанию " + defaultProcessorsCount + " для вашей системы) или пустую строку для выхода:");
+                while (true)
+                {
+                    try
+                    {
+                        path = Console.ReadLine();
+
+                        if (path == "")
+                        {
+                            isPathInputCanceled = true;
+                            break;
+                        }
+
+                        int enteredProcessorsCount = Convert.ToInt32(path);
+
+                        if (enteredProcessorsCount >= TextAnalyseParams.MIN_THREADS_COUNT && enteredProcessorsCount <= TextAnalyseParams.MAX_THREADS_COUNT)
+                        {
+                            selectedProcessorsCount = enteredProcessorsCount;
+                            break;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Введите количество потоков " + TextAnalyseParams.MIN_THREADS_COUNT + "-" + TextAnalyseParams.MAX_THREADS_COUNT
+                                + " (по умолчанию " + defaultProcessorsCount + " для вашей системы) или пустую строку для выхода:");
+                        }
+                    }
+                    catch
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Введите количество потоков " + TextAnalyseParams.MIN_THREADS_COUNT + "-" + TextAnalyseParams.MAX_THREADS_COUNT
+                        + " (по умолчанию " + defaultProcessorsCount + " для вашей системы) или пустую строку для выхода:");
+                    }
+                }
+                if (isPathInputCanceled)
+                    break;
+
+                #endregion
+
                 consoleOutputLoopThread = new Thread(TextInConsoleAnalyseLoop);
                 consoleOutputLoopThread.Start();
 
                 analyseThread = new Thread(AnalyseTextLoop);
                 analyseThread.Start();
-                
+
 
 
 
@@ -157,7 +204,8 @@ namespace CrossInform.FrequencyTextAnalyzer
         private static void AnalyseTextLoop()
         {
             isAnalysing = true;
-            result = (TextAnalyseResult)textAnalyser.SyncAnalyseText(textProvider);
+            TextAnalyseParams parameters = new TextAnalyseParams(selectedProcessorsCount);
+            result = (TextAnalyseResult)textAnalyser.SyncAnalyseText(textProvider, parameters);
             isAnalysing = false;
         }
 

@@ -15,21 +15,19 @@ namespace CrossInform.FrequencyTextAnalyzer
     public class TextTripletAnalyser : ITextAnalyser
     {
         public const int CHARS_COUNT_TO_SEARCH = 3;
-
-        public const int MIN_THREADS_COUNT = 1;
-        public const int MAX_THREADS_COUNT = 48;
-
+        
         private bool isAbortRequested = false;
         private bool isAnalysing = false;
-        private int threadsCount = MAX_THREADS_COUNT;
+        private int threadsCount = TextAnalyseParams.MAX_THREADS_COUNT;
         private int charsCountToSearch = CHARS_COUNT_TO_SEARCH;
 
         /// <summary>
         /// Синхронный вариант метода (останавливает родительский поток) анализа текста в многопоточном режиме.
         /// </summary>
-        /// <param name="textProvider"></param>
+        /// <param name="textProvider">Эклемпляр класса реализующий интерфейс ITextProvider</param>
+        /// <param name="parameters">Экземпляр класса параметров для анализа. Может быть null</param>
         /// <returns></returns>
-        public ITextStatisticsAnalyseResult SyncAnalyseText(ITextProvider textProvider)
+        public ITextStatisticsAnalyseResult SyncAnalyseText(ITextProvider textProvider, TextAnalyseParams parameters)
         {
             // Этапы
             // 1) Определить кол-во потоков
@@ -47,11 +45,13 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
 
             // Копирование кол-ва потоков в отдельнюу переменную для защиты от изменения в процессе работы алгоритма
-
-            //int currentThreadsCount = threadsCount;
-            // HACK: Хардкод
-            threadsCount = 1;
+            
             int currentThreadsCount = threadsCount;
+            if (parameters != null)
+            {
+                currentThreadsCount = MathUtils.Clamp(TextAnalyseParams.MIN_THREADS_COUNT, TextAnalyseParams.MAX_THREADS_COUNT, parameters.ThreadsCount);
+                threadsCount = currentThreadsCount;
+            }
 
             isAnalysing = true;
             Stopwatch sw = new Stopwatch();
@@ -155,8 +155,8 @@ namespace CrossInform.FrequencyTextAnalyzer
             set
             {
                 // TODO: решить должен ли здесь вобде быть экспешен, или достаточно задавать max значение...
-                if (value < MIN_THREADS_COUNT || value > MAX_THREADS_COUNT)
-                    throw new Exception("Заданное число поток вне допустимых границ: " + MAX_THREADS_COUNT + "-" + MAX_THREADS_COUNT + "! Получено значение: " + value);
+                if (value < TextAnalyseParams.MIN_THREADS_COUNT || value > TextAnalyseParams.MAX_THREADS_COUNT)
+                    throw new Exception("Заданное число поток вне допустимых границ: " + TextAnalyseParams.MAX_THREADS_COUNT + "-" + TextAnalyseParams.MAX_THREADS_COUNT + "! Получено значение: " + value);
                 this.threadsCount = value;
             }
         }
