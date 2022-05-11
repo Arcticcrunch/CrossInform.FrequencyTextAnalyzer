@@ -41,6 +41,8 @@ namespace CrossInform.FrequencyTextAnalyzer
             // 4) Подождать пока все потоки завершатся после чего соеденить результаты
             // 5) Вывести статистику по результатам
 
+            isAbortRequested = false;
+            
             string text = textProvider.GetText();
             if (String.IsNullOrEmpty(text))
             {
@@ -103,7 +105,6 @@ namespace CrossInform.FrequencyTextAnalyzer
             TextAnalyseResult result = new TextAnalyseResult(resultState, sw.ElapsedMilliseconds, resultDictionary, textProvider);
             
             isAnalysing = false;
-            isAbortRequested = false;
             return result;
         }
 
@@ -157,6 +158,7 @@ namespace CrossInform.FrequencyTextAnalyzer
                 return isAbortRequested;
             }
         }
+        
 
         public void RequestAbort()
         {

@@ -21,19 +21,42 @@ namespace CrossInform.FrequencyTextAnalyzer
 
         private static bool isAnalysing = true;
         private static ITextAnalyser textAnalyser;
+        private static FileTextReader textProvider;
+        private static TextAnalyseResult result;
 
+        private static Thread consoleOutputLoopThread;
+        private static Thread analyseThread;
 
 
         static void Main(string[] args)
         {
+            Console.Title = "Частотный анализатор текста";
+
             textAnalyser = new TextTripletAnalyser();
-            MockTextProvider textProvider = new MockTextProvider();
-            textProvider.SetText("asdf  ffd asdf asdq");
 
-            Thread th = new Thread(TextInConsoleAnalyseLoop);
-            th.Start();
+            //MockTextProvider textProvider = new MockTextProvider();
+            //textProvider.SetText("asdf  ffd asdf asdq");
 
-            ITextStatisticsAnalyseResult result = textAnalyser.SyncAnalyseText(textProvider);
+            textProvider = new FileTextReader();
+            textProvider.OpenFile("Text Lorem ipsum.txt");
+
+
+            consoleOutputLoopThread = new Thread(TextInConsoleAnalyseLoop);
+            consoleOutputLoopThread.Start();
+
+            analyseThread = new Thread(AnalyseTextLoop);
+            analyseThread.Start();
+
+            //analyseTask = new Task<ITextStatisticsAnalyseResult>(() => 
+            //{
+            //    isAnalysing = true;
+            //    ITextStatisticsAnalyseResult r = textAnalyser.SyncAnalyseText(textProvider);
+            //    isAnalysing = false;
+            //    return r;
+            //});
+            //analyseTask.Start();
+            
+
 
             while(isAnalysing)
             {
@@ -41,13 +64,12 @@ namespace CrossInform.FrequencyTextAnalyzer
                 if(s.Key == ConsoleKey.Escape)
                 {
                     textAnalyser.RequestAbort();
-                    //break;
                 }
             }
 
 
 
-            //Console.Title = "Частотный анализатор текста";
+            
             //Console.WriteLine("{0}Частотный анализ завершен.{0}{1}{0}{0}Время выполнения: {2} мс",
             //    Environment.NewLine, result.GetResult(), result.GetExecutionDuration());
 
@@ -64,11 +86,11 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             while (isAnalysing)
             {
-                if (textAnalyser.IsAnalysing == false)
-                {
-                    isAnalysing = false;
-                    break;
-                }
+                //if (textAnalyser.IsAnalysing == false)
+                //{
+                //    isAnalysing = false;
+                //    break;
+                //}
 
                 timePassed = timePassed.Add(DateTime.Now - lastUpdateTime);
                 dotsCount++;
@@ -86,12 +108,34 @@ namespace CrossInform.FrequencyTextAnalyzer
 
                 Console.SetCursorPosition(0, 1);
                 Console.WriteLine("Прошло времени: {0}", timePassed.ToString(@"hh\:mm\:ss"));
+                Console.WriteLine("ESC - для отмены");
 
                 lastUpdateTime = DateTime.Now;
                 Thread.Sleep(CONSOLE_UPDATE_INTERVAL_MILLIS);
             }
+
+            // Ожидание потока который анализирует данные. Это гарантирует то что когда этот поток (выводящий текст в консоль)
+            // попытается получить результат анализа - он будет готов (исключит гонку потоков т.к. оба потока зависят от статической переменной)
+            analyseThread.Join();
+
             Console.Clear();
-            Console.WriteLine("Завершено.");
+            if (textAnalyser.IsAbortRequested)
+            {
+                Console.WriteLine("Анализ прерван. Прошло времени: " + timePassed.ToString(@"hh\:mm\:ss"));
+            }
+            else
+            {
+                Console.WriteLine("Анализ завершен.");
+                Console.WriteLine("Кол-во уникальных ключей: " + result.StatisticsResult.Count);
+            }
+
+        }
+
+        static private void AnalyseTextLoop()
+        {
+            isAnalysing = true;
+            result = (TextAnalyseResult)textAnalyser.SyncAnalyseText(textProvider);
+            isAnalysing = false;
         }
     }
 }

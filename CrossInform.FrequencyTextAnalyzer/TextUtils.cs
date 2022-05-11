@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
@@ -26,6 +27,9 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             while (index < text.Length)
             {
+                // HACK: Искуственная задержка
+                //Thread.Sleep(200);
+
                 if (analyser != null)
                 {
                     if (analyser.IsAbortRequested)
