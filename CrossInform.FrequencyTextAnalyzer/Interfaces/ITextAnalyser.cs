@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CrossInform.FrequencyTextAnalyzer.Interfaces
 {
+    /// <summary>
+    /// Интерфейс анализатора текста
+    /// </summary>
     public interface ITextAnalyser
     {
         ITextStatisticsAnalyseResult SyncAnalyseText(ITextProvider textProvider, TextAnalyseParams parameters);

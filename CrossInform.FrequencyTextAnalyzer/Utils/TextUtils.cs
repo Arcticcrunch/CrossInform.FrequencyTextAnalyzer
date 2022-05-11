@@ -6,6 +6,9 @@ using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
 namespace CrossInform.FrequencyTextAnalyzer
 {
+    /// <summary>
+    /// Класс со вспомогательным функционалом для работы с текстом
+    /// </summary>
     public static class TextUtils
     {
         public const int PROGRESS_BAR_CHARS_COUNT = 30;
@@ -75,6 +78,12 @@ namespace CrossInform.FrequencyTextAnalyzer
             return result;
         }
 
+        /// <summary>
+        /// Форматировать результаты анализа текстов
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="samplesCount"></param>
+        /// <returns></returns>
         public static string FormatTextAnalyseResult(ITextStatisticsAnalyseResult result, int samplesCount = 10)
         {
             if (result == null)

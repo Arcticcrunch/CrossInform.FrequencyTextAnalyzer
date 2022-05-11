@@ -7,6 +7,9 @@ using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
 namespace CrossInform.FrequencyTextAnalyzer
 {
+    /// <summary>
+    /// Результат анализа текста
+    /// </summary>
     public class TextAnalyseResult : ITextStatisticsAnalyseResult
     {
         private long executionDuration = 0;

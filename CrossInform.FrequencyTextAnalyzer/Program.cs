@@ -34,7 +34,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             textAnalyser = new TextTripletAnalyser();
 
             textProvider = new FileTextReader();
-            textProvider.OpenFile("Text Lorem ipsum.txt");
+            // textProvider.OpenFile("Text Lorem ipsum.txt");
 
             // Получить кол-во логических процессоров. Тесты показывают что использовани в 2 раза большего кол-ва
             // потоков чем кол-во логических (не физических) ядер быстрее. Возможно связанно с уровнем приоритета потоков...
