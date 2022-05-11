@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using CrossInform.FrequencyTextAnalyzer.Interfaces;
 
@@ -107,6 +108,7 @@ namespace CrossInform.FrequencyTextAnalyzer
 
 
         // TODO: Вынести этот метод в отдельный Util класс т.к. в каждой реализации интерфейса ITextAnalyser будет необходим подобный класс
+        // TODO: Сделать метод публичным и написать к нему тест
 
         /// <summary>
         /// Разделяет входной текст на сегменты по знаку пробела. Сегментов может быть меньше ожидаемого из-за меньшего
@@ -117,22 +119,46 @@ namespace CrossInform.FrequencyTextAnalyzer
         /// <returns></returns>
         private string[] SplitTextOnSegments(string text, int segmentsCount)
         {
-            if (segmentsCount == 1)
+            if (segmentsCount <= 1 )
                 return new string[] { text };
-            // HACK: хардкод
-            //else throw new NotImplementedException();
-
             else
             {
-                // HACK: не учитывается то что слово может разделится в разные сегменты. доделать этот метод!
-                string[] resultArr = new string[segmentsCount];
+                List<string> segmentsList = new List<string>();
+                StringBuilder buffer = new StringBuilder();
                 int segmentLength = text.Length / segmentsCount;
-                for (int i = 0; i < segmentsCount; i++)
+                int currentSegmentLength = 0;
+                char ch;
+
+                // Разбиение текста на сегменты делается за 1 проход. Исходя из нужного кол-ва сегментов (потоков) подсчитывается длинна сегмента. 
+                // Цикл копирует все символы в буфер пока нужная длинна не наберётся и не будет найден следующий пробел. Далее буфер копируется в список и очищается. 
+                for (int i = 0; i < text.Length; i++)
                 {
-                    resultArr[i] = text.Substring(segmentLength * i, segmentLength);
+                    ch = text[i];
+                    if (currentSegmentLength >= segmentLength)
+                    {
+                        if (ch == ' ')
+                        {
+                            segmentsList.Add(buffer.ToString());
+                            buffer.Clear();
+                            currentSegmentLength = 0;
+                        }
+                        else
+                        {
+                            buffer.Append(ch);
+                            currentSegmentLength++;
+                        }
+                    }
+                    else
+                    {
+                        buffer.Append(ch);
+                        currentSegmentLength++;
+                    }
                 }
-                return resultArr;
-                //return new string[] { text.Substring(0, text.Length / 2), text.Substring(text.Length / 2, (text.Length / 2)) };
+
+                if (buffer.Length != 0)
+                    segmentsList.Add(buffer.ToString());
+
+                return segmentsList.ToArray();
             }
         }
 

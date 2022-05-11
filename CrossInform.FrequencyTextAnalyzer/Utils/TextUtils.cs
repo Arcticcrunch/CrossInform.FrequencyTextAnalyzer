@@ -29,9 +29,6 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             while (index < text.Length)
             {
-                // HACK: Искуственная задержка
-                //Thread.Sleep(200);
-
                 if (analyser != null)
                 {
                     if (analyser.IsAbortRequested)
