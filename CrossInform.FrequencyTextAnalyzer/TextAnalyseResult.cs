@@ -9,12 +9,12 @@ namespace CrossInform.FrequencyTextAnalyzer
 {
     public class TextAnalyseResult : ITextStatisticsAnalyseResult
     {
-        private double executionDuration = 0;
+        private long executionDuration = 0;
         private AnalyseResultState resultState;
         private Dictionary<char[], int> statisticsResult = new Dictionary<char[], int>();
         private ITextProvider textProvider;
 
-        public TextAnalyseResult(AnalyseResultState resultState, double executionDuration, Dictionary<char[], int> result, ITextProvider textProvider)
+        public TextAnalyseResult(AnalyseResultState resultState, long executionDuration, Dictionary<char[], int> result, ITextProvider textProvider)
         {
             this.executionDuration = executionDuration;
             this.resultState = resultState;
@@ -38,7 +38,7 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
         }
 
-        public double GetExecutionDuration()
+        public long GetExecutionDuration()
         {
             return executionDuration;
         }
@@ -46,6 +46,43 @@ namespace CrossInform.FrequencyTextAnalyzer
         public ITextProvider GetOriginText()
         {
             return this.textProvider;
+        }
+
+
+        // TODO: Вынести этот мтеов в отдельный Util класс т.к. в других реализациях ITextStatisticsAnalyseResult он может понадобиться 
+
+        /// <summary>
+        /// Добавляет элементы результирующей коллекции
+        /// </summary>
+        /// <param name="secondResult">Вторая последовательность (её элементы будут добавлен к первой)</param>
+        /// <returns></returns>
+        public void MergeResults( Dictionary<char[], int> secondResult)
+        {
+            // Использование статического варианта
+            MergeResults(statisticsResult, secondResult);
+
+            
+        }
+
+        /// <summary>
+        /// Статический метод объеденения двух результатов коллекций
+        /// </summary>
+        /// <param name="firstResult">Первая последовательность (к ней будут добавлены элементы второй)</param>
+        /// <param name="secondResult">Вторая последовательность (её элементы будут добавлен к первой)</param>
+        public static void MergeResults(Dictionary<char[], int> firstResult, Dictionary<char[], int> secondResult)
+        {
+            var keys = secondResult.Keys;
+            foreach (var key in keys)
+            {
+                if (firstResult.ContainsKey(key))
+                {
+                    firstResult[key] = firstResult[key] + secondResult[key];
+                }
+                else
+                {
+                    firstResult.Add(key, secondResult[key]);
+                }
+            }
         }
     }
 }

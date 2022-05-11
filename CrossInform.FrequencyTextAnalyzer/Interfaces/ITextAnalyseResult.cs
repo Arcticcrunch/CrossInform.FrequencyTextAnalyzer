@@ -12,8 +12,10 @@ namespace CrossInform.FrequencyTextAnalyzer.Interfaces
     public interface ITextStatisticsAnalyseResult
     {
         Dictionary<char[], int> StatisticsResult { get; }
+        void MergeResults(Dictionary<char[], int> secondResult);
+
         AnalyseResultState ResultState { get; }
-        double GetExecutionDuration();
+        long GetExecutionDuration();
         ITextProvider GetOriginText();
     }
 

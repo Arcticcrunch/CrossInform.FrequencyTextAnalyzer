@@ -60,7 +60,6 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             // Разделение текста на кол-во сегментов соответствующее кол-ву желаемых потоков
             string[] textSegments = SplitTextOnSegments(text, currentThreadsCount);
-
             int segmentsCount = textSegments.Length;
 
             // Создание массива тасков в количестве равном полученному кол-ву сегментов
@@ -83,6 +82,7 @@ namespace CrossInform.FrequencyTextAnalyzer
 
             AnalyseResultState resultState = AnalyseResultState.Complete;
             Dictionary<char[], int> resultDictionary = new Dictionary<char[], int>();
+            
 
             // Проверка был ли вызван аборт
             if (isAbortRequested)
@@ -91,26 +91,17 @@ namespace CrossInform.FrequencyTextAnalyzer
             }
             else
             {
-                // Если аборта небыло - объеденение коллекций
-                foreach (Dictionary<char[], int> dict in taskResults)
+                // Если аборта небыло - объеденение коллекций всех потоков в результирующую коллекцию
+                foreach (var taskResult in taskResults)
                 {
-                    var keys = dict.Keys;
-                    foreach (var key in keys)
-                    {
-                        if (resultDictionary.ContainsKey(key))
-                        {
-                            resultDictionary[key] = resultDictionary[key] + dict[key];
-                        }
-                        else
-                        {
-                            resultDictionary.Add(key, dict[key]);
-                        }
-                    }
+                    TextAnalyseResult.MergeResults(resultDictionary, taskResult);
                 }
             }
 
-            TextAnalyseResult result = new TextAnalyseResult(resultState, sw.ElapsedMilliseconds, resultDictionary, textProvider);
             sw.Stop();
+
+            TextAnalyseResult result = new TextAnalyseResult(resultState, sw.ElapsedMilliseconds, resultDictionary, textProvider);
+            
             isAnalysing = false;
             isAbortRequested = false;
             return result;
